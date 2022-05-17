@@ -18,6 +18,7 @@ internal static class Extensions
         services.AddScoped<IWeeklyParkingSpotRepository, PostgresWeeklyParkingSpotRepository>();
         services.AddScoped<IUserRepository, PostgresUserRepository>();
         services.AddScoped<IUnitOfWork, PostgresUnitOfWork>();
+        services.AddHostedService<DatabaseInitializer>();
 
         // EF Core + Npgsql issue
         AppContext.SetSwitch("Npgsql.EnableLegacyTimestampBehavior", true);
