@@ -2,7 +2,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using MySpot.Infrastructure.DAL;
 
-namespace MySpot.Tests.Integration;
+namespace MySpot.Tests.EndToEnd;
 
 internal class TestDatabase : IDisposable
 {
@@ -10,10 +10,10 @@ internal class TestDatabase : IDisposable
 
     public TestDatabase()
     {
-        var connectionString = "Host=localhost;Database=MySpot-test;Username=postgres;Password=";
+        var options = new OptionsProvider().Get<PostgresOptions>("postgres");
         Context = new MySpotDbContext(
             new DbContextOptionsBuilder<MySpotDbContext>()
-                .UseNpgsql(connectionString).Options);
+                .UseNpgsql(options.ConnectionString).Options);
     }
 
     public void Dispose()
