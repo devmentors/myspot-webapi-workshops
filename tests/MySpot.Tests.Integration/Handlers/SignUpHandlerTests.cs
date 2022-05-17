@@ -5,6 +5,7 @@ using Microsoft.EntityFrameworkCore;
 using MySpot.Application.Abstractions;
 using MySpot.Application.Commands;
 using MySpot.Application.Commands.Handlers;
+using MySpot.Application.Exceptions;
 using MySpot.Application.Security;
 using MySpot.Core.Abstractions;
 using MySpot.Core.Entities;
@@ -37,6 +38,36 @@ public class SignUpHandlerTests : IDisposable
             .Users.SingleOrDefaultAsync(x => x.Id.Equals(command.UserId));
 
         user.ShouldNotBeNull();
+    }
+    
+    [Fact]
+    public async Task given_already_existing_email_user_should_not_be_created()
+    {
+        const string email = "user1@myspot.io";
+        await InitDatabaseAsync();
+        await _userRepository.AddAsync(new User(Guid.NewGuid(), email, "user1", "secret",
+            "John Doe", "user", _clock.Current()));
+        var command = new SignUp(Guid.NewGuid(), email, "user2", "secret", "John Doe", "user");
+
+        var exception = await Record.ExceptionAsync(() => Act(command));
+
+        exception.ShouldNotBeNull();
+        exception.ShouldBeOfType<EmailAlreadyInUseException>();
+    }
+
+    [Fact]
+    public async Task given_already_existing_username_user_should_not_be_created()
+    {
+        const string username = "user1";
+        await InitDatabaseAsync();
+        await _userRepository.AddAsync(new User(Guid.NewGuid(), "user1@myspot.io", username, "secret",
+            "John Doe", "user", _clock.Current()));
+        var command = new SignUp(Guid.NewGuid(), "user2@myspot.io", username, "secret", "John Doe", "user");
+
+        var exception = await Record.ExceptionAsync(() => Act(command));
+
+        exception.ShouldNotBeNull();
+        exception.ShouldBeOfType<UsernameAlreadyInUseException>();
     }
 
     private async Task InitDatabaseAsync()
