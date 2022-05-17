@@ -1,7 +1,9 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using MySpot.Application.Abstractions;
 using MySpot.Core.Repositories;
+using MySpot.Infrastructure.DAL.Decorators;
 using MySpot.Infrastructure.DAL.Repositories;
 
 namespace MySpot.Infrastructure.DAL;
@@ -19,6 +21,7 @@ internal static class Extensions
         services.AddScoped<IUserRepository, PostgresUserRepository>();
         services.AddScoped<IUnitOfWork, PostgresUnitOfWork>();
         services.AddHostedService<DatabaseInitializer>();
+        services.TryDecorate(typeof(ICommandHandler<>), typeof(UnitOfWorkDecorator<>));
 
         // EF Core + Npgsql issue
         AppContext.SetSwitch("Npgsql.EnableLegacyTimestampBehavior", true);
