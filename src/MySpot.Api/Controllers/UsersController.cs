@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using MySpot.Application.Abstractions;
 using MySpot.Application.Commands;
@@ -73,5 +74,12 @@ public class UsersController : ControllerBase
         await _signInHandler.HandleAsync(command);
         var jwt = _tokenStorage.Get();
         return jwt;
+    }
+
+    [Authorize]
+    [HttpGet("secret")]
+    public ActionResult<string> GetSecret()
+    {
+        return "Secret";
     }
 }
