@@ -8,6 +8,7 @@ using MySpot.Core.Abstractions;
 using MySpot.Infrastructure.Auth;
 using MySpot.Infrastructure.DAL;
 using MySpot.Infrastructure.Exceptions;
+using MySpot.Infrastructure.Logging;
 using MySpot.Infrastructure.Security;
 using MySpot.Infrastructure.Time;
 
@@ -30,6 +31,7 @@ public static class Extensions
             // .AddSingleton<IWeeklyParkingSpotRepository, InMemoryWeeklyParkingSpotRepository>()
             .AddSingleton<IClock, Clock>();
 
+        services.TryDecorate(typeof(ICommandHandler<>), typeof(LoggingCommandHandlerDecorator<>));
         services.AddSecurity();
         services.AddEndpointsApiExplorer();
         services.AddSwaggerGen(swagger =>
